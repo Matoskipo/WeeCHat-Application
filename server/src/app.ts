@@ -1,10 +1,13 @@
 import express from'express';
 import path from'path';
+import connectDB from './config/db.config';
 import cookieParser from'cookie-parser';
 import logger from'morgan';
 
 // import indexRouter from'../routes/index';
-import indexRouter from'./routes/index';
+import indexRouter from'./routes/userRouter';
+
+connectDB()
 
 var app = express();
 
@@ -14,7 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+app.use('/api/messenger', indexRouter);
 // app.use('/users', usersRouter);
 
 export default app

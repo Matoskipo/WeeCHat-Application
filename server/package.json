@@ -16,10 +16,12 @@
     "dotenv": "^16.0.3",
     "express": "~4.16.1",
     "formidable": "^2.0.1",
+    "joi": "^17.7.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.7.1",
     "morgan": "~1.9.1",
     "nodemon": "^2.0.20",
+    "path": "^0.12.7",
     "typescript": "^4.8.4",
     "validator": "^13.7.0"
   },
@@ -28,6 +30,8 @@
     "@types/body-parser": "^1.19.2",
     "@types/concurrently": "^7.0.0",
     "@types/cookie-parser": "^1.4.3",
+    "@types/formidable": "^2.0.5",
+    "@types/joi": "^17.2.3",
     "@types/jsonwebtoken": "^8.5.9",
     "@types/morgan": "^1.9.3",
     "@types/validator": "^13.7.10"
