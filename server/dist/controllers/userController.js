@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userRegister = void 0;
+exports.userLogin = exports.userRegister = void 0;
 const path_1 = __importDefault(require("path"));
 const formidable_1 = __importDefault(require("formidable"));
 const validator_1 = __importDefault(require("validator"));
@@ -116,3 +116,68 @@ const userRegister = (req, res) => {
     //  end of formidable
 };
 exports.userRegister = userRegister;
+const userLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const error = [];
+    const { email, password } = req.body;
+    if (!email) {
+        error.push("please provide an email");
+    }
+    if (!password) {
+        error.push("please provide your password");
+    }
+    if (email && !validator_1.default.isEmail(email)) {
+        error.push('please provide your valid email');
+    }
+    if (error.length > 0) {
+        res.status(400).json({
+            error: {
+                errorMessage: error
+            }
+        });
+    }
+    else {
+        try {
+            const checkUser = yield user_1.default.findOne({
+                email: email
+            }).select('+password');
+            if (checkUser) {
+                const comparePassword = yield bcrypt_1.default.compare(password, checkUser.password);
+                if (comparePassword) {
+                    const token = (0, utils_1.generateLoginToken)({
+                        id: checkUser._id,
+                        email: checkUser.email,
+                        userName: checkUser.userName,
+                        image: checkUser.image,
+                        // registerTime : userCreate?.createdAt
+                    });
+                    res.status(200).cookie("userToken", token, utils_1.options).json({
+                        successMessage: "Your login was successful",
+                        token,
+                    });
+                }
+                else {
+                    res.status(400).json({
+                        error: {
+                            errorMessage: ['Invalid password']
+                        }
+                    });
+                }
+            }
+            else {
+                res.status(400).json({
+                    error: {
+                        errorMessage: ['Invalid email']
+                    }
+                });
+            }
+        }
+        catch (error) {
+            res.status(400).json({
+                error: {
+                    errorMessage: ['Internal server error']
+                }
+            });
+        }
+    }
+});
+exports.userLogin = userLogin;

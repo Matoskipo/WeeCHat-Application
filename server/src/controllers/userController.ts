@@ -105,3 +105,68 @@ export const userRegister = (req: Request, res: Response) => {
   });
   //  end of formidable
 };
+
+export const userLogin =async (req:Request, res:Response)=>{
+  const error = []
+  const {email, password} = req.body
+  if (!email) {
+      error.push("please provide an email");
+    }
+  if (!password) {
+      error.push("please provide your password");
+    }
+  if(email && !validator.isEmail(email)){
+    error.push('please provide your valid email')
+  }
+  if(error.length > 0){
+    res.status(400).json({
+      error:{
+        errorMessage:error
+      }
+    })
+  }
+  else{
+    try {
+      const checkUser = await user.findOne({
+        email:email
+      }).select('+password')
+      if(checkUser){
+        const comparePassword = await bcrypt.compare(password,checkUser.password)
+        if(comparePassword){
+           const token = generateLoginToken({
+                              id : checkUser._id,
+                              email: checkUser.email,
+                              userName: checkUser.userName,
+                              image: checkUser.image,
+                              // registerTime : userCreate?.createdAt
+              })
+               res.status(200).cookie("userToken", token, options).json({
+                successMessage: "Your login was successful",
+                token,
+              });
+        }
+       else{
+        res.status(400).json({
+          error:{
+            errorMessage: ['Invalid password']
+          }
+        })
+       }
+
+      }
+      else{
+        res.status(400).json({
+          error:{
+            errorMessage: ['Invalid email']
+          }
+        })
+      }
+    } catch (error) {
+      res.status(400).json({
+          error:{
+            errorMessage: ['Internal server error']
+          }
+        })
+    }
+  }
+}
